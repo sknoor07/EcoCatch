@@ -2,77 +2,168 @@
 
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { Phone, Mail, MapPin } from "lucide-react";
+import Image from "next/image";
+
+const founders = [
+  {
+    initials: "YR",
+    name: "Yugal Roy",
+    role: "Founder & Managing Director",
+    photo: "/founders/ritik.jpg",
+    bio: "A visionary entrepreneur who saw opportunity in India's agricultural waste. With deep expertise spanning biogas, waste processing, oil & gas, cement, industrial automation, and energy audits, Yugal built EcoCatch into a full-service EPC company trusted by 150+ clients across the nation.",
+    extra: "Under his leadership, EcoCatch has bridged global technology with local execution — importing cutting-edge equipment from Italy, Northern Ireland, UK, and the US, while maintaining a strong Make-in-India fabrication presence in Vasai.",
+    phone: "+919892906496",
+    email: "yugal.roy@ecocatch.in",
+    linkedin: "https://www.linkedin.com/in/yugal-roy-385661152/",
+    location: "Mumbai, Maharashtra, India",
+    gradient: "from-[#1B4332] to-[#2D5A3D]",
+  },
+  {
+    initials: "AK",
+    name: "Amit Khanna",
+    role: "Co-Founder & CTO",
+    photo: "/founders/amit-khanna.jpg",
+    bio: "A seasoned technologist with 15+ years in renewable energy systems and process engineering. Amit architects the core biogas and waste-to-energy solutions that power EcoCatch's project portfolio across India.",
+    extra: "He leads R&D partnerships with European technology providers and ensures every plant design meets the highest efficiency and safety standards.",
+    phone: "+919876543210",
+    email: "amit@ecocatch.in",
+    linkedin: "https://linkedin.com/in/amit-khanna",
+    location: "Mumbai, Maharashtra, India",
+    gradient: "from-[#0F2E1F] to-[#1B4332]",
+  },
+  {
+    initials: "SP",
+    name: "Sneha Patel",
+    role: "Co-Founder & COO",
+    photo: "/founders/sneha-patel.jpg",
+    bio: "An operations expert who scaled EcoCatch's execution capabilities from a single workshop to a nationwide EPC presence. Sneha oversees project delivery, supply chain, and client relationships.",
+    extra: "Her background in industrial automation and energy audits ensures seamless integration of imported technology with local fabrication and on-ground execution.",
+    phone: "+919812345678",
+    email: "sneha@ecocatch.in",
+    linkedin: "https://linkedin.com/in/sneha-patel",
+    location: "Mumbai, Maharashtra, India",
+    gradient: "from-[#2D5A3D] to-[#1B4332]",
+  },
+];
+
+function LinkedInIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 01-2.063-2.065 2.064 2.064 0 112.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+    </svg>
+  );
+}
 
 export function FounderProfile() {
   return (
-    <section className="relative py-24 px-4 bg-[#F0F0F0] dark:bg-[#111]">
-      <div className="mx-auto max-w-7xl">
-        <div className="grid gap-12 lg:grid-cols-2 lg:gap-20 items-center">
-          <ScrollReveal>
-            <div className="relative">
-              <div className="aspect-[4/5] w-full max-w-md mx-auto rounded-3xl bg-[#1B4332] dark:bg-[#1a3d2a] overflow-hidden">
-                {/* Placeholder for Yugal Roy photo */}
-                <div className="flex h-full w-full items-center justify-center">
-                  <div className="text-center">
-                    <div className="mx-auto mb-4 flex h-24 w-24 items-center justify-center rounded-full bg-white/10 text-4xl font-bold text-white">
-                      YR
+    <section className="relative overflow-hidden py-24 px-4 bg-[#F0F0F0] dark:bg-[#0A0A0A]">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -top-20 -left-20 h-96 w-96 rounded-full bg-[#4ADE80]/5 blur-3xl" />
+        <div className="absolute -bottom-20 -right-20 h-96 w-96 rounded-full bg-[#2D5A3D]/10 blur-3xl" />
+      </div>
+
+      <div className="relative mx-auto max-w-7xl">
+        <ScrollReveal>
+          <div className="mb-16 text-center">
+            <p className="mb-3 text-sm font-medium tracking-[0.25em] text-[#86868b] uppercase">
+              The People Behind the Mission
+            </p>
+            <h2 className="text-4xl font-bold tracking-tight text-[#1A1A1A] dark:text-[#E5E5E5] sm:text-5xl">
+              Meet Our <span className="text-[#2D5A3D] dark:text-[#4ADE80]">Leadership</span>
+            </h2>
+          </div>
+        </ScrollReveal>
+
+        <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+          {founders.map((founder, idx) => (
+            <ScrollReveal key={founder.initials} delay={idx * 0.15}>
+              <div className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#111] shadow-sm transition-all duration-500 hover:-translate-y-2 hover:shadow-2xl hover:shadow-[#4ADE80]/10">
+
+                {/* Green Header */}
+                <div className={`relative h-36 bg-gradient-to-br ${founder.gradient}`}>
+                  <div className="absolute inset-0 opacity-10"
+                    style={{
+                      backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
+                      backgroundSize: '20px 20px',
+                    }}
+                  />
+                </div>
+
+                {/* Avatar - ALWAYS circular, overlapping header & body */}
+                <div className="relative flex justify-center">
+                  <div className="absolute -top-16">
+                    <div className=" relative h-32 w-32 rounded-full border-4 border-white dark:border-[#111] bg-[#1B4332] shadow-xl overflow-hidden transition-transform duration-500 group-hover:scale-105">
+                      {founder.photo ? (
+                        <Image
+                          src={founder.photo}
+                          alt={founder.name}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center">
+                          <span className="text-3xl font-bold text-white">
+                            {founder.initials}
+                          </span>
+                        </div>
+                      )}
                     </div>
-                    <p className="text-sm text-white/60">Photo placeholder</p>
                   </div>
                 </div>
-              </div>
-              {/* Decorative element */}
-              <div className="absolute -bottom-6 -right-6 h-32 w-32 rounded-full bg-[#4ADE80]/20 blur-2xl" />
-              <div className="absolute -top-6 -left-6 h-24 w-24 rounded-full bg-[#2D5A3D]/20 blur-2xl" />
-            </div>
-          </ScrollReveal>
 
-          <ScrollReveal delay={0.2}>
-            <div className="space-y-6">
-              <p className="text-sm font-medium tracking-[0.2em] text-[#86868b] uppercase">
-                Leadership
-              </p>
-              <h2 className="text-3xl font-bold tracking-tight text-[#1A1A1A] dark:text-[#E5E5E5] sm:text-5xl">
-                Yugal Roy
-              </h2>
-              <p className="text-lg font-medium text-[#2D5A3D] dark:text-[#4ADE80]">
-                Founder & Managing Director
-              </p>
-              <p className="text-[#86868b] leading-relaxed">
-                A visionary entrepreneur who saw opportunity in India's agricultural waste. 
-                With deep expertise spanning biogas, waste processing, oil & gas, cement, 
-                industrial automation, and energy audits, Yugal built EcoCatch into a 
-                full-service EPC company trusted by 150+ clients across the nation.
-              </p>
-              <p className="text-[#86868b] leading-relaxed">
-                Under his leadership, EcoCatch has bridged global technology with local execution — 
-                importing cutting-edge equipment from Italy, Northern Ireland, UK, and the US, 
-                while maintaining a strong Make-in-India fabrication presence in Vasai.
-              </p>
+                {/* Card Body */}
+                <div className="flex flex-1 flex-col px-7 pt-20 pb-7 text-center">
+                  <h3 className="text-2xl font-bold text-[#1A1A1A] dark:text-[#E5E5E5]">
+                    {founder.name}
+                  </h3>
+                  <p className="mt-1 text-sm font-semibold tracking-wide text-[#2D5A3D] dark:text-[#4ADE80] uppercase">
+                    {founder.role}
+                  </p>
 
-              <div className="flex flex-wrap gap-4 pt-4">
-                <a
-                  href="tel:+919892906496"
-                  className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-[#0A0A0A] border border-[#1A1A1A]/10 dark:border-[#E5E5E5]/10 px-4 py-2 text-sm text-[#1A1A1A] dark:text-[#E5E5E5] hover:border-[#2D5A3D] dark:hover:border-[#4ADE80] transition-colors"
-                >
-                  <Phone className="h-4 w-4 text-[#2D5A3D] dark:text-[#4ADE80]" />
-                  +91 98929 06496
-                </a>
-                <a
-                  href="mailto:info@ecocatch.in"
-                  className="inline-flex items-center gap-2 rounded-full bg-white dark:bg-[#0A0A0A] border border-[#1A1A1A]/10 dark:border-[#E5E5E5]/10 px-4 py-2 text-sm text-[#1A1A1A] dark:text-[#E5E5E5] hover:border-[#2D5A3D] dark:hover:border-[#4ADE80] transition-colors"
-                >
-                  <Mail className="h-4 w-4 text-[#2D5A3D] dark:text-[#4ADE80]" />
-                  info@ecocatch.in
-                </a>
-              </div>
+                  <div className="mt-5 space-y-3 text-sm leading-relaxed text-[#86868b] text-left">
+                    <p>{founder.bio}</p>
+                    <p>{founder.extra}</p>
+                  </div>
 
-              <div className="flex items-center gap-2 pt-2 text-sm text-[#86868b]">
-                <MapPin className="h-4 w-4" />
-                Mumbai, Maharashtra, India
+                  <div className="mt-auto pt-6">
+                    <div className="mb-4 flex items-center justify-center gap-2 text-xs text-[#86868b]">
+                      <MapPin className="h-3.5 w-3.5" />
+                      {founder.location}
+                    </div>
+
+                    <div className="flex items-center justify-center gap-2">
+                      {/* <a
+                        href={`tel:${founder.phone}`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#F0F0F0] dark:bg-[#1A1A1A] px-3 py-1.5 text-xs font-medium text-[#1A1A1A] dark:text-[#E5E5E5] transition-colors hover:bg-[#2D5A3D] hover:text-white dark:hover:bg-[#4ADE80] dark:hover:text-[#0A0A0A]"
+                      >
+                        <Phone className="h-3.5 w-3.5" />
+                        Call
+                      </a> */}
+                      <a
+                        href={`mailto:${founder.email}`}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#F0F0F0] dark:bg-[#1A1A1A] px-3 py-1.5 text-xs font-medium text-[#1A1A1A] dark:text-[#E5E5E5] transition-colors hover:bg-[#2D5A3D] hover:text-white dark:hover:bg-[#4ADE80] dark:hover:text-[#0A0A0A]"
+                      >
+                        <Mail className="h-3.5 w-3.5" />
+                        Email
+                      </a>
+                      <a
+                        href={founder.linkedin}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 rounded-full bg-[#F0F0F0] dark:bg-[#1A1A1A] px-3 py-1.5 text-xs font-medium text-[#1A1A1A] dark:text-[#E5E5E5] transition-colors hover:bg-[#0077b5] hover:text-white"
+                      >
+                        <LinkedInIcon className="h-3.5 w-3.5" />
+                        LinkedIn
+                      </a>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom accent line */}
+                <div className="absolute bottom-0 left-0 h-1 w-0 bg-gradient-to-r from-[#2D5A3D] to-[#4ADE80] transition-all duration-500 group-hover:w-full" />
               </div>
-            </div>
-          </ScrollReveal>
+            </ScrollReveal>
+          ))}
         </div>
       </div>
     </section>

@@ -39,7 +39,7 @@ export function Footer() {
       e.preventDefault();
       const contactSection = document.getElementById("contact");
       if (contactSection) {
-        contactSection.scrollIntoView({ behavior: "smooth" });
+        contactSection.scrollIntoView({ behavior: "smooth", block: "center" });
       }
     }
   }

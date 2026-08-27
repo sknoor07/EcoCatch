@@ -5,9 +5,10 @@ import { usePathname } from "next/navigation";
 import { Leaf, LayoutDashboard, Factory, Mail, Settings, LogOut, Package } from "lucide-react";
 import { cn } from "@/lib/utils";
 import api from "@/db/api-client";
+import { Button } from "@/components/ui/button";
 
 
-const links = [
+export const links = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Products", href: "/admin/products", icon: Package },
   { label: "Plants", href: "/admin/plants", icon: Factory },
@@ -25,7 +26,7 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40 hidden h-screen w-64 flex-col border-r border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#0A0A0A] lg:flex">
+    <aside className="fixed left-0 top-0 z-40  h-screen w-64 flex-col border-r border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#0A0A0A] lg:flex">
       <div className="flex h-16 items-center gap-2 border-b border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2D5A3D] dark:bg-[#4ADE80]">
           <Leaf className="h-4 w-4 text-white dark:text-[#0A0A0A]" />
@@ -38,7 +39,9 @@ export function AdminSidebar() {
 
       <nav className="flex-1 space-y-1 p-4">
         {links.map((link) => {
-          const active = pathname === link.href || pathname?.startsWith(`${link.href}/`);
+          const active = link.href === "/admin"
+            ? pathname === "/admin"
+            : pathname === link.href || pathname?.startsWith(`${link.href}/`);
           return (
             <Link
               key={link.href}
@@ -58,13 +61,13 @@ export function AdminSidebar() {
       </nav>
 
       <div className="border-t border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 p-4">
-        <button
+        <Button
           onClick={handleLogout}
           className="flex w-full items-center gap-3 cursor-pointer rounded-xl px-3 py-2.5 text-sm font-medium text-red-600 dark:text-red-400 transition-colors hover:bg-red-50 dark:hover:bg-red-900/20"
         >
           <LogOut className="h-4 w-4" />
           Logout
-        </button>
+        </Button>
       </div>
     </aside>
   );

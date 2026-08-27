@@ -6,8 +6,21 @@ import { Check, ArrowRight, Mail } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { Product } from "@/types/admin";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 
 export function ProductDetail({ product }: { product: Product }) {
+  const pathname = usePathname();
+  const handleQuoteClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === "/") {
+      e.preventDefault();
+      const contactSection = document.getElementById("contact");
+      if (contactSection) {
+        contactSection.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  }
+
   return (
     <div className="space-y-16">
       {/* Header */}
@@ -113,8 +126,9 @@ export function ProductDetail({ product }: { product: Product }) {
             Our engineers will help you select the right configuration for your plant size, feedstock, and budget.
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <a
+            <Link
               href="/#contact"
+              onClick={(e) => handleQuoteClick(e)}
               className={cn(
                 buttonVariants({ size: "lg" }),
                 "rounded-full bg-white text-[#1B4332] hover:bg-[#E8F4E8] font-semibold px-6 inline-flex items-center justify-center text-decoration-none"
@@ -122,7 +136,7 @@ export function ProductDetail({ product }: { product: Product }) {
             >
               Request a Quote
               <ArrowRight className="ml-2 h-4 w-4" />
-            </a>
+            </Link>
             <a
               href="mailto:info@ecocatch.in"
               className={cn(

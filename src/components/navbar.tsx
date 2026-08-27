@@ -157,15 +157,9 @@ export function Navbar({ solutions }: { solutions: Product[] }) {
         <div className="flex items-center gap-2 md:hidden">
           <ThemeToggle />
           <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger >
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-9 w-9 rounded-full"
-                aria-label="Open menu"
-              >
-                <Menu className="h-5 w-5 text-[#1A1A1A] dark:text-[#E5E5E5]" />
-              </Button>
+            {/* Style the SheetTrigger directly like a button to avoid nesting conflicts */}
+            <SheetTrigger className="inline-flex items-center justify-center h-9 w-9 rounded-full hover:bg-[#1A1A1A]/5 dark:hover:bg-[#E5E5E5]/5 transition-colors cursor-pointer" aria-label="Open menu">
+              <Menu className="h-5 w-5 text-[#1A1A1A] dark:text-[#E5E5E5]" />
             </SheetTrigger>
             <SheetContent
               side="right"
