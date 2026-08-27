@@ -50,3 +50,5 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
 
   return NextResponse.json({ data: result[0] });
 }
+
+

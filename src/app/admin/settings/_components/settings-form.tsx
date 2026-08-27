@@ -49,69 +49,54 @@ export function SettingsForm() {
     const previewUrl = URL.createObjectURL(file);
     setAvatar(previewUrl);
 
-    // const reader = new FileReader();
-    // reader.onloadend = () => setAvatar(reader.result as string);
-    // reader.readAsDataURL(file);
+
   };
 
-  // const handleSaveProfile = async () => {
-  //   if (!user) return;
-  //   setSaving(true);
-  //   try {
-  //     const res = await api.patch("/admin/me", { name, email, avatar });
-  //     setUser(res.data.user);
-  //     toast.success("Profile updated");
-  //   } catch (err: any) {
-  //     toast.error(err.response?.data?.error || "Update failed");
-  //   } finally {
-  //     setSaving(false);
-  //   }
-  // };
 
   const handleSaveProfile = async () => {
-  if (!user) return;
+    if (!user) return;
 
-  setSaving(true);
+    setSaving(true);
 
-  try {
-    let avatarUrl = avatar;
+    try {
+      let avatarUrl = avatar;
 
-    // Upload new avatar first
-    if (avatarFile) {
-      const formData = new FormData();
-      formData.append("file", avatarFile);
+      // Upload new avatar first
+      if (avatarFile) {
+        const formData = new FormData();
+        formData.append("file", avatarFile);
 
-      const uploadRes = await api.post(
-        "/admin/me/avatar",
-        formData
+        const uploadRes = await api.post(
+          "/admin/me/avatar",
+          formData
+        );
+
+        avatarUrl = uploadRes.data.avatar;
+
+        setAvatar(avatarUrl);
+        setAvatarFile(null);
+      }
+
+      // Update profile information
+      const res = await api.patch("/admin/me", {
+        name,
+        email,
+        avatar: avatarUrl,
+      });
+
+      setUser(res.data.user);
+
+      toast.success("Profile updated");
+    } catch (err: any) {
+      console.error(err);
+
+      toast.error(
+        err.response?.data?.error || "Update failed"
       );
-
-      avatarUrl = uploadRes.data.avatar;
-
-      setAvatar(avatarUrl);
-      setAvatarFile(null);
+    } finally {
+      setSaving(false);
     }
-
-    // Update profile information
-    const res = await api.patch("/admin/me", {
-      name,
-      email,
-      avatar: avatarUrl,
-    });
-
-    setUser(res.data.user);
-
-    toast.success("Profile updated");
-  } catch (err: any) {
-    console.error(err);
-
-    toast.error(
-      err.response?.data?.error || "Update failed"
-    );
-  } finally {
-    setSaving(false);
-  }
-};
+  };
 
   const handleChangePassword = async () => {
     if (!oldPassword || !newPassword) {

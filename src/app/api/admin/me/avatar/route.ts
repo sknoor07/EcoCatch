@@ -51,6 +51,10 @@ export async function POST(req: NextRequest) {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
           folder: "ecocatch/admin-avatars",
+          // FIXED PUBLIC ID: Ensures every upload for this specific user overwrites the exact same file slot
+          public_id: `user_${payload.userId}`,
+          overwrite: true,
+          invalidate: true,
           resource_type: "image",
           transformation: [
             {
