@@ -99,7 +99,7 @@ export function AdminHeader({ mobileOpen, onToggle }: AdminHeaderProps) {
                   {filteredLinks.map((link) => {
                     const Icon = link.icon;
                     return (
-                      <Button
+                      <button
                         key={link.href}
                         onClick={() => {
                           router.push(link.href);
@@ -111,7 +111,7 @@ export function AdminHeader({ mobileOpen, onToggle }: AdminHeaderProps) {
                           <Icon className="h-4 w-4" />
                         </div>
                         <span>{link.label}</span>
-                      </Button>
+                      </button>
                     );
                   })}
                 </div>
