@@ -7,7 +7,6 @@ import { cn } from "@/lib/utils";
 import api from "@/db/api-client";
 import { Button } from "@/components/ui/button";
 
-
 export const links = [
   { label: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { label: "Products", href: "/admin/products", icon: Package },
@@ -16,7 +15,12 @@ export const links = [
   { label: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
-export function AdminSidebar() {
+interface AdminSidebarProps {
+  mobile?: boolean;
+  onLinkClick?: () => void;
+}
+
+export function AdminSidebar({ mobile, onLinkClick }: AdminSidebarProps) {
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -26,7 +30,14 @@ export function AdminSidebar() {
   };
 
   return (
-    <aside className="fixed left-0 top-0 z-40  h-screen w-64 flex-col border-r border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#0A0A0A] lg:flex">
+    <aside
+      className={cn(
+        "z-40 w-64 flex-col border-r border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#0A0A0A]",
+        mobile
+          ? "relative flex h-full"
+          : "fixed left-0 top-0 hidden h-screen lg:flex"
+      )}
+    >
       <div className="flex h-16 items-center gap-2 border-b border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 px-6">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#2D5A3D] dark:bg-[#4ADE80]">
           <Leaf className="h-4 w-4 text-white dark:text-[#0A0A0A]" />
@@ -46,6 +57,7 @@ export function AdminSidebar() {
             <Link
               key={link.href}
               href={link.href}
+              onClick={onLinkClick}
               className={cn(
                 "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors",
                 active
