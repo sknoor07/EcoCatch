@@ -137,7 +137,7 @@ export function AdminHeader({ mobileOpen, onToggle }: AdminHeaderProps) {
           </Button>
         </Link>
         <Link href="/admin/settings">
-          <div className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 dark:border-[#E5E5E5]/10 bg-[#FAF9F6] dark:bg-[#111] px-3 py-1.5 transition-colors hover:border-[#2D5A3D]/30 dark:hover:border-[#4ADE80]/30 cursor-pointer">
+          <div className="flex items-center cursor-pointer sm:gap-2 sm:rounded-full sm:border sm:border-[#1A1A1A]/10 sm:dark:border-[#E5E5E5]/10 sm:bg-[#FAF9F6] sm:dark:bg-[#111] sm:px-3 sm:py-1.5 sm:transition-colors sm:hover:border-[#2D5A3D]/30 sm:dark:hover:border-[#4ADE80]/30">
             {user?.avatar ? (
               <img src={user.avatar} alt="" className="h-7 w-7 rounded-full object-cover" />
             ) : (
@@ -145,7 +145,7 @@ export function AdminHeader({ mobileOpen, onToggle }: AdminHeaderProps) {
                 {user?.name?.[0] || user?.email?.[0] || "A"}
               </div>
             )}
-            <span className="text-sm font-medium text-[#1A1A1A] dark:text-[#E5E5E5]">
+            <span className="hidden sm:inline text-sm font-medium text-[#1A1A1A] dark:text-[#E5E5E5]">
               {user?.name || user?.email || "Admin"}
             </span>
           </div>

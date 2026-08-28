@@ -2,14 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { Factory, Mail, Users, TrendingUp } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 import api from "@/db/api-client";
-
+import { ContactDetailDialog } from "./_components/contact-detail-dialog";
+import type { Contact } from "@/types/admin";
 
 interface Stats {
   totalContacts: number;
   totalPlants: number;
   activePlants: number;
-  recentContacts: any[];
+  recentContacts: Contact[];
 }
 
 export default function AdminDashboardPage() {
@@ -19,12 +21,14 @@ export default function AdminDashboardPage() {
     activePlants: 0,
     recentContacts: [],
   });
+  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const contactsRes = await api.get("/admin/contacts");
-        const contacts = contactsRes.data.data || [];
+        const contacts: Contact[] = contactsRes.data.data || [];
         setStats((s) => ({
           ...s,
           totalContacts: contacts.length,
@@ -37,77 +41,204 @@ export default function AdminDashboardPage() {
     fetchData();
   }, []);
 
-  //totalplants
-  useEffect(()=>{
-    const fetctPlants= async ()=>{
+  useEffect(() => {
+    const fetchPlants = async () => {
       try {
         const plantsRes = await api.get("/admin/plants");
         const plants = plantsRes.data.data || [];
-        console.log(plants)
         setStats((s) => ({
           ...s,
           totalPlants: plants.length,
-          activePlants: plants.filter((p: any) => p.status==="active").length,
+          activePlants: plants.filter((p: any) => p.status === "active").length,
         }));
       } catch {
         console.log("Failed to load plants");
       }
     };
-    fetctPlants();
+    fetchPlants();
   }, []);
 
+  const notifyUnreadChange = (delta: number) => {
+    window.dispatchEvent(
+      new CustomEvent("notifications-updated", { detail: { delta } })
+    );
+  };
+
+  const updateContact = async (
+    id: number,
+    updates: Partial<Contact>
+  ) => {
+    try {
+      await api.put(`/admin/contacts/${id}`, updates);
+
+      setStats((prev) => {
+        const current = prev.recentContacts.find((c) => c.id === id);
+
+        if (
+          updates.isRead !== undefined &&
+          current &&
+          current.isRead !== updates.isRead
+        ) {
+          notifyUnreadChange(updates.isRead ? -1 : 1);
+        }
+
+        return {
+          ...prev,
+          recentContacts: prev.recentContacts.map((c) =>
+            c.id === id
+              ? { ...c, ...updates }
+              : c
+          ),
+        };
+      });
+
+      setSelectedContact((prev) =>
+        prev?.id === id
+          ? { ...prev, ...updates }
+          : prev
+      );
+    } catch (error) {
+      console.error("Failed to update contact:", error);
+      throw error;
+    }
+  };
+
+  const openContact = (contact: Contact) => {
+    setSelectedContact(contact);
+    setDialogOpen(true);
+  };
+
   const cards = [
-    { label: "Total Contacts", value: stats.totalContacts, icon: Mail, color: "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400" },
-    { label: "Total Plants", value: stats.totalPlants, icon: Factory, color: "bg-[#E8F4E8] dark:bg-[#1a3d2a] text-[#2D5A3D] dark:text-[#4ADE80]" },
-    { label: "Active Plants", value: stats.activePlants, icon: TrendingUp, color: "bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400" },
-    { label: "Team Members", value: 1, icon: Users, color: "bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400" },
+    {
+      label: "Total Contacts",
+      value: stats.totalContacts,
+      icon: Mail,
+      color:
+        "bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400",
+    },
+    {
+      label: "Total Plants",
+      value: stats.totalPlants,
+      icon: Factory,
+      color:
+        "bg-[#E8F4E8] dark:bg-[#1a3d2a] text-[#2D5A3D] dark:text-[#4ADE80]",
+    },
+    {
+      label: "Active Plants",
+      value: stats.activePlants,
+      icon: TrendingUp,
+      color:
+        "bg-amber-100 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400",
+    },
+    {
+      label: "Team Members",
+      value: 1,
+      icon: Users,
+      color:
+        "bg-purple-100 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400",
+    },
   ];
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-bold text-[#1A1A1A] dark:text-[#E5E5E5]">Dashboard</h1>
-        <p className="text-sm text-[#86868b]">Overview of your EcoCatch operations</p>
+        <h1 className="text-2xl font-bold text-[#1A1A1A] dark:text-[#E5E5E5]">
+          Dashboard
+        </h1>
+        <p className="text-sm text-[#86868b]">
+          Overview of your EcoCatch operations
+        </p>
       </div>
 
+      {/* Stats Cards */}
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {cards.map((card) => (
           <div
             key={card.label}
             className="rounded-2xl border border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#111] p-5"
           >
-            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${card.color}">
+            <div
+              className={`mb-3 flex h-10 w-10 items-center justify-center rounded-xl ${card.color}`}
+            >
               <card.icon className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-[#1A1A1A] dark:text-[#E5E5E5]">{card.value}</p>
+            <p className="text-2xl font-bold text-[#1A1A1A] dark:text-[#E5E5E5]">
+              {card.value}
+            </p>
             <p className="text-xs text-[#86868b]">{card.label}</p>
           </div>
         ))}
       </div>
 
+      {/* Recent Queries — Now Clickable */}
       <div className="rounded-2xl border border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-white dark:bg-[#111] p-6">
-        <h2 className="mb-4 text-lg font-semibold text-[#1A1A1A] dark:text-[#E5E5E5]">Recent Queries</h2>
+        <h2 className="mb-4 text-lg font-semibold text-[#1A1A1A] dark:text-[#E5E5E5]">
+          Recent Queries
+        </h2>
         {stats.recentContacts.length === 0 ? (
           <p className="text-sm text-[#86868b]">No contact submissions yet.</p>
         ) : (
           <div className="space-y-3">
-            {stats.recentContacts.map((c: any) => (
+            {stats.recentContacts.map((c) => (
               <div
                 key={c.id}
-                className="flex items-center justify-between rounded-xl border border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 px-4 py-3"
+                onClick={() => openContact(c)}
+                className={`flex cursor-pointer items-center justify-between rounded-xl border px-4 py-3 transition-colors hover:bg-[#F0F0F0] dark:hover:bg-[#1A1A1A]/40 ${!c.isRead
+                  ? "border-[#2D5A3D]/20 bg-[#E8F4E8]/30 dark:border-[#4ADE80]/20 dark:bg-[#1a3d2a]/20"
+                  : "border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5"
+                  }`}
               >
-                <div>
-                  <p className="text-sm font-medium text-[#1A1A1A] dark:text-[#E5E5E5]">{c.name}</p>
-                  <p className="text-xs text-[#86868b]">{c.email} — {c.phone || "No phone"}</p>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p
+                      className={`text-sm font-medium ${!c.isRead
+                        ? "text-[#1A1A1A] dark:text-[#E5E5E5]"
+                        : "text-[#86868b]"
+                        }`}
+                    >
+                      {c.name}
+                    </p>
+                    {!c.isRead && (
+                      <span className="h-2 w-2 rounded-full bg-[#2D5A3D] dark:bg-[#4ADE80]" />
+                    )}
+                  </div>
+                  <p className="text-xs text-[#86868b] truncate">
+                    {c.email} — {c.phone || "No phone"}
+                  </p>
+                  {c.selectedProducts.length > 0 && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      {c.selectedProducts.map((p) => (
+                        <span
+                          key={p.id}
+                          className="rounded-full bg-[#E8F4E8] px-2 py-0.5 text-[10px] font-medium text-[#2D5A3D] dark:bg-[#1a3d2a] dark:text-[#4ADE80]"
+                        >
+                          {p.name}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-                <span className="text-xs text-[#86868b]">
-                  {new Date(c.createdAt).toLocaleDateString()}
+                <span className="shrink-0 text-xs text-[#86868b] ml-4">
+                  {formatDistanceToNow(new Date(c.createdAt), {
+                    addSuffix: true,
+                  })}
                 </span>
               </div>
             ))}
           </div>
         )}
       </div>
+
+      {/* Reusable Dialog */}
+      <ContactDetailDialog
+        contact={selectedContact}
+        open={dialogOpen}
+        onOpenChange={(open) => {
+          setDialogOpen(open);
+          if (!open) setSelectedContact(null);
+        }}
+        onUpdate={updateContact}
+      />
     </div>
   );
 }
