@@ -3,6 +3,9 @@ import { google } from "googleapis";
 
 const OAuth2 = google.auth.OAuth2;
 
+const escapeHtml = (value: string) =>
+  value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+
 const oauth2Client = new OAuth2(
   process.env.GMAIL_CLIENT_ID,
   process.env.GMAIL_CLIENT_SECRET,
@@ -34,6 +37,7 @@ export async function sendContactEmail(data: {
   email: string;
   phone?: string;
   message: string;
+  selectedProducts: { id: number; name: string }[];
 }) {
   const transporter = await createTransporter();
 
@@ -48,19 +52,27 @@ export async function sendContactEmail(data: {
         <table style="width: 100%; border-collapse: collapse;">
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Name</td>
-            <td style="padding: 10px; border-bottom: 1px solid #eee;">${data.name}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${escapeHtml(data.name)}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Email</td>
-            <td style="padding: 10px; border-bottom: 1px solid #eee;">${data.email}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${escapeHtml(data.email)}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Phone</td>
-            <td style="padding: 10px; border-bottom: 1px solid #eee;">${data.phone || "Not provided"}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${data.phone ? escapeHtml(data.phone) : "Not provided"}</td>
+          </tr>
+          <tr>
+            <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold; vertical-align: top;">Selected Products</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">
+              <ul style="margin: 0; padding-left: 18px;">
+                ${data.selectedProducts.map((product) => `<li style="margin-bottom: 4px;">${escapeHtml(product.name)}</li>`).join("")}
+              </ul>
+            </td>
           </tr>
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #eee; font-weight: bold;">Message</td>
-            <td style="padding: 10px; border-bottom: 1px solid #eee;">${data.message.replace(/\n/g, "<br>")}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #eee;">${escapeHtml(data.message).replace(/\n/g, "<br>")}</td>
           </tr>
           <tr>
             <td style="padding: 10px; font-weight: bold;">Submitted At</td>

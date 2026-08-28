@@ -32,7 +32,6 @@ export function HeroSection() {
         framePrefix="ezgif-frame-"
         frameExtension=".jpg"
         totalFrames={276}
-        smoothing={0.08}
       />
     </section>
   );

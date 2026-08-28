@@ -7,6 +7,7 @@ import { Footer } from "@/components/footer";
 import { ScrollReveal } from "@/components/scroll-reveal";
 import { BiogasPlant3D } from "@/components/biogas-plant-3d"; // <-- Standard import now
 import { Metadata } from "next";
+import { getActiveProducts } from "@/lib/product_data";
 
 export const metadata: Metadata = {
   alternates: {
@@ -14,7 +15,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function Home() {
+export default async function Home() {
+  const products = await getActiveProducts();
   return (
     <>
       <HeroSection />
@@ -32,7 +34,7 @@ export default function Home() {
       </ScrollReveal>
 
       <ScrollReveal>
-        <ContactSection />
+        <ContactSection products={products} />
       </ScrollReveal>
 
       <Footer />

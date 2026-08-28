@@ -7,7 +7,6 @@ import {
   real,
   integer,
   boolean,
-  PgInteger,
   jsonb,
 } from "drizzle-orm/pg-core";
 
@@ -17,6 +16,10 @@ export const contacts = pgTable("contacts", {
   email: varchar("email", { length: 255 }).notNull(),
   phone: varchar("phone", { length: 50 }),
   message: text("message").notNull(),
+  selectedProducts: jsonb("selected_products")
+    .$type<{ id: number; name: string }[]>()
+    .default([])
+    .notNull(),
   isRead: boolean("is_read").default(false),
   isImportant: boolean("is_important").default(false),
   replyMessage: text("reply_message"),

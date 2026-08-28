@@ -1,10 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useLoading } from "./loading-provider";
-
-// Inside ScrollSequence component:
-
 
 interface ScrollSequenceProps {
   framePath?: string;
@@ -13,232 +10,123 @@ interface ScrollSequenceProps {
   startFrame?: number;
   totalFrames?: number;
   framePadding?: number;
-  smoothing?: number;
   className?: string;
 }
 
-export function ScrollSequence({
-  framePath = "/images/",
-  framePrefix = "ezgif-frame-",
-  frameExtension = ".jpg",
-  startFrame = 1,
-  totalFrames = 300,
-  framePadding = 3,
-  smoothing = 0.08,
-  className = "",
-}: ScrollSequenceProps) {
+export function ScrollSequence({ framePath = "/images/", framePrefix = "ezgif-frame-", frameExtension = ".jpg", startFrame = 1, totalFrames = 300, framePadding = 3, className = "" }: ScrollSequenceProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const imagesRef = useRef<HTMLImageElement[]>([]);
+  const drawRafRef = useRef<number | null>(null);
+  const frameCountRef = useRef(totalFrames);
   const [loadedCount, setLoadedCount] = useState(0);
+  const [frameCount, setFrameCount] = useState(totalFrames);
   const [isLoaded, setIsLoaded] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
-
-  const imagesRef = useRef<HTMLImageElement[]>([]);
-  const currentFrameRef = useRef(1);
-  const targetFrameRef = useRef(1);
-  const rafRef = useRef<number>(0);
   const { setFramesReady } = useLoading();
 
-  const getFrameName = useCallback(
-    (index: number) => {
-      const padded = index.toString().padStart(framePadding, "0");
-      return `${framePath}${framePrefix}${padded}${frameExtension}`;
-    },
-    [framePath, framePrefix, frameExtension, framePadding]
-  );
-
-  useEffect(() => {
-    const images: HTMLImageElement[] = [];
-    let loaded = 0;
-
-    for (let i = startFrame; i <= totalFrames; i++) {
-      const img = new Image();
-      img.src = getFrameName(i);
-      img.onload = () => {
-        loaded++;
-        setLoadedCount(loaded);
-        if (loaded === totalFrames) setIsLoaded(true);
-      };
-      images.push(img);
-    }
-    imagesRef.current = images;
-    return () => {
-      imagesRef.current = [];
-    };
-  }, [getFrameName, startFrame, totalFrames]);
-
-  const resizeCanvas = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const dpr = window.devicePixelRatio || 1;
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    const ctx = canvas.getContext("2d");
-    if (ctx) ctx.scale(dpr, dpr);
-    if (imagesRef.current[Math.round(currentFrameRef.current) - 1]) {
-      drawFrame(Math.round(currentFrameRef.current));
-    }
-  }, []);
+  const getFrameName = useCallback((index: number) => `${framePath}${framePrefix}${index.toString().padStart(framePadding, "0")}${frameExtension}`, [frameExtension, framePadding, framePath, framePrefix]);
 
   const drawFrame = useCallback((frameIndex: number) => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext("2d");
-    const img = imagesRef.current[frameIndex - 1];
-    if (!canvas || !ctx || !img || !img.complete) return;
-    const canvasWidth = window.innerWidth;
-    const canvasHeight = window.innerHeight;
-    const scale = Math.max(canvasWidth / img.width, canvasHeight / img.height);
-    const drawWidth = img.width * scale;
-    const drawHeight = img.height * scale;
-    const x = (canvasWidth - drawWidth) / 2;
-    const y = (canvasHeight - drawHeight) / 2;
-    ctx.fillStyle = "#000000";
-    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-    ctx.drawImage(img, x, y, drawWidth, drawHeight);
+    const image = imagesRef.current[frameIndex];
+    if (!canvas || !ctx || !image?.complete || !image.naturalWidth) return;
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    if (canvas.width !== width * dpr || canvas.height !== height * dpr) {
+      canvas.width = width * dpr;
+      canvas.height = height * dpr;
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    const scale = Math.max(width / image.width, height / image.height);
+    const drawWidth = image.width * scale;
+    const drawHeight = image.height * scale;
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, width, height);
+    ctx.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
   }, []);
 
   useEffect(() => {
-    const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReducedMotion) return;
-    const container = containerRef.current;
-    if (!container) return;
+    const isMobile = window.matchMedia("(max-width: 767px)").matches;
+    const step = isMobile ? 4 : 1;
+    const frameNumbers = Array.from({ length: Math.ceil((totalFrames - startFrame + 1) / step) }, (_, index) => Math.min(startFrame + index * step, totalFrames));
+    if (frameNumbers.at(-1) !== totalFrames) frameNumbers.push(totalFrames);
 
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
-      const sectionTop = container.offsetTop;
-      const sectionHeight = container.offsetHeight;
-      const viewportHeight = window.innerHeight;
-      let progress = (scrollTop - sectionTop) / (sectionHeight - viewportHeight);
-      progress = Math.max(0, Math.min(1, progress));
-      targetFrameRef.current = 1 + progress * (totalFrames - 1);
-      setScrollProgress(progress);
-    };
+    let cancelled = false;
+    let loaded = 0;
+    const images = frameNumbers.map(() => new Image());
+    images.forEach((image) => {
+      image.decoding = "async";
+      const complete = () => {
+        if (cancelled) return;
+        loaded += 1;
+        setLoadedCount(loaded);
+        if (loaded === 1) {
+          setFrameCount(frameNumbers.length);
+          setFramesReady(true);
+        }
+        if (loaded === frameNumbers.length) setIsLoaded(true);
+      };
+      image.onload = complete;
+      image.onerror = complete;
+    });
+    imagesRef.current = images;
+    frameCountRef.current = frameNumbers.length;
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [totalFrames]);
+    // Paint a first frame before background-loading the rest of the sequence.
+    images[0].src = getFrameName(frameNumbers[0]);
+    const timer = window.setTimeout(() => {
+      images.slice(1).forEach((image, index) => { image.src = getFrameName(frameNumbers[index + 1]); });
+    }, 120);
+    return () => { cancelled = true; window.clearTimeout(timer); imagesRef.current = []; };
+  }, [getFrameName, setFramesReady, startFrame, totalFrames]);
 
   useEffect(() => {
     if (!isLoaded) return;
-    const loop = () => {
-      currentFrameRef.current += (targetFrameRef.current - currentFrameRef.current) * smoothing;
-      drawFrame(Math.round(currentFrameRef.current));
-      rafRef.current = requestAnimationFrame(loop);
+    const container = containerRef.current;
+    if (!container) return;
+    const updateFrame = () => {
+      drawRafRef.current = null;
+      const progress = Math.max(0, Math.min(1, (window.scrollY - container.offsetTop) / (container.offsetHeight - window.innerHeight)));
+      setScrollProgress(progress);
+      drawFrame(Math.round(progress * (frameCountRef.current - 1)));
     };
-    rafRef.current = requestAnimationFrame(loop);
-    return () => cancelAnimationFrame(rafRef.current);
-  }, [isLoaded, smoothing, drawFrame]);
-
-  useEffect(() => {
-    window.addEventListener("resize", resizeCanvas);
-    return () => window.removeEventListener("resize", resizeCanvas);
-  }, [resizeCanvas]);
-
-  useEffect(() => {
-    if (isLoaded) resizeCanvas();
-  }, [isLoaded, resizeCanvas]);
-
-  useEffect(() => {
-  if (loadedCount === totalFrames) {
-    setFramesReady(true);
-  }
-}, [loadedCount, totalFrames, setFramesReady]);
+    const onScroll = () => {
+      if (drawRafRef.current === null) drawRafRef.current = requestAnimationFrame(updateFrame);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+      if (drawRafRef.current !== null) cancelAnimationFrame(drawRafRef.current);
+    };
+  }, [drawFrame, isLoaded]);
 
   return (
     <div ref={containerRef} className={`relative ${className}`} style={{ height: "600vh" }}>
       <div className="sticky top-0 h-screen w-full overflow-hidden bg-black">
-        {!isLoaded && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black">
-            <div className="w-[200px] text-center">
-              <div className="mb-4 text-xs tracking-[0.2em] text-[#86868b]">LOADING EXPERIENCE</div>
-              <div className="h-[2px] w-full overflow-hidden rounded bg-white/10">
-                <div className="h-full bg-white transition-all duration-100" style={{ width: `${Math.floor((loadedCount / totalFrames) * 100)}%` }} />
-              </div>
-              <div className="mt-2 text-xs text-white">{Math.floor((loadedCount / totalFrames) * 100)}%</div>
-            </div>
-          </div>
-        )}
+        {!isLoaded && <div className="absolute inset-0 z-20 flex items-center justify-center bg-black text-xs text-white">Loading experience: {Math.floor((loadedCount / frameCount) * 100)}%</div>}
         <canvas ref={canvasRef} className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2" />
         <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-          <ScrollTextOverlay progress={scrollProgress} start={0.1} end={0.25}>
-            <h3 className="text-center text-4xl font-semibold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] sm:text-5xl md:text-7xl">
-              A NEW ERA
-            </h3>
-          </ScrollTextOverlay>
-          <ScrollTextOverlay progress={scrollProgress} start={0.35} end={0.5}>
-            <h3 className="text-center text-4xl font-semibold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] sm:text-5xl md:text-7xl">
-              ENGINEERED<br />FORWARD
-            </h3>
-          </ScrollTextOverlay>
-          <ScrollTextOverlay progress={scrollProgress} start={0.6} end={0.75}>
-            <h3 className="text-center text-4xl font-semibold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] sm:text-5xl md:text-7xl">
-              PRECISION<br />IN EVERY DETAIL
-            </h3>
-          </ScrollTextOverlay>
-          <ScrollTextOverlay progress={scrollProgress} start={0.85} end={1.0}>
-            <h3 className="text-center text-4xl font-semibold tracking-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)] sm:text-5xl md:text-7xl">
-              THE FUTURE<br />IS HERE
-            </h3>
-          </ScrollTextOverlay>
-        </div>
-        <div className="fixed right-5 top-1/2 z-10 hidden -translate-y-1/2 md:block">
-          <div className="h-[100px] w-[2px] rounded-full bg-white/10">
-            <div
-              className="w-full rounded-full bg-white transition-all duration-75"
-              style={{ height: `${scrollProgress * 100}%` }}
-            />
-          </div>
+          <ScrollTextOverlay progress={scrollProgress} start={0.1} end={0.25}>A NEW ERA</ScrollTextOverlay>
+          <ScrollTextOverlay progress={scrollProgress} start={0.35} end={0.5}>ENGINEERED<br />FORWARD</ScrollTextOverlay>
+          <ScrollTextOverlay progress={scrollProgress} start={0.6} end={0.75}>PRECISION<br />IN EVERY DETAIL</ScrollTextOverlay>
+          <ScrollTextOverlay progress={scrollProgress} start={0.85} end={1}>THE FUTURE<br />IS HERE</ScrollTextOverlay>
         </div>
       </div>
     </div>
   );
 }
 
-function ScrollTextOverlay({
-  children,
-  progress,
-  start,
-  end,
-}: {
-  children: React.ReactNode;
-  progress: number;
-  start: number;
-  end: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
-
-    const duration = end - start;
-    const sceneProgress = (progress - start) / duration;
-
-    if (progress < start || progress > end) {
-      el.style.opacity = "0";
-      const transformY = progress < start ? 40 : -40;
-      el.style.transform = `translateY(${transformY}px)`;
-      return;
-    }
-
-    const opacity = Math.sin(sceneProgress * Math.PI);
-    const transformY = 40 - sceneProgress * 80;
-
-    el.style.opacity = opacity.toFixed(3);
-    el.style.transform = `translateY(${transformY}px)`;
-  }, [progress, start, end]);
-
-  return (
-    <div
-      ref={ref}
-      className="absolute will-change-[opacity,transform]"
-      style={{ opacity: 0, transform: "translateY(40px)" }}
-    >
-      {children}
-    </div>
-  );
+function ScrollTextOverlay({ children, progress, start, end }: { children: React.ReactNode; progress: number; start: number; end: number }) {
+  const sceneProgress = (progress - start) / (end - start);
+  const visible = progress >= start && progress <= end;
+  return <div className="absolute text-center text-4xl font-semibold tracking-tight text-white will-change-[opacity,transform] sm:text-5xl md:text-7xl" style={{ opacity: visible ? Math.sin(sceneProgress * Math.PI) : 0, transform: `translateY(${visible ? 40 - sceneProgress * 80 : progress < start ? 40 : -40}px)` }}>{children}</div>;
 }

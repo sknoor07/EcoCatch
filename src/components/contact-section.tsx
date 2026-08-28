@@ -4,9 +4,10 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Send, MapPin, Phone, Mail, CheckCircle, Loader2 } from "lucide-react";
 import api from "@/db/api-client";
+import { Product } from "@/types/admin";
+import { isAxiosError } from "axios";
 
-
-export function ContactSection() {
+export function ContactSection({ products }: { products: Product[] }) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -15,7 +16,9 @@ export function ContactSection() {
     email: "",
     phone: "",
     message: "",
+    selectedProductIds: [] as number[],
   });
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,14 +28,23 @@ export function ContactSection() {
     try {
       await api.post("/contact", form);
       setSubmitted(true);
-      setForm({ name: "", email: "", phone: "", message: "" });
-    } catch (err: any) {
+      setForm({ name: "", email: "", phone: "", message: "", selectedProductIds: [] });
+    } catch (err: unknown) {
       setError(
-        err.response?.data?.error || "Something went wrong. Please try again."
+        isAxiosError(err) ? err.response?.data?.error || "Something went wrong. Please try again." : "Something went wrong. Please try again."
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  const toggleProduct = (productId: number) => {
+    setForm((current) => ({
+      ...current,
+      selectedProductIds: current.selectedProductIds.includes(productId)
+        ? current.selectedProductIds.filter((id) => id !== productId)
+        : [...current.selectedProductIds, productId],
+    }));
   };
 
   return (
@@ -148,6 +160,39 @@ export function ContactSection() {
                   </div>
                 </div>
                 <div className="space-y-2">
+                  <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+                    <label className="text-sm font-medium text-[#1A1A1A] dark:text-[#E5E5E5]">
+                      Products you are interested in <span className="text-[#2D5A3D] dark:text-[#4ADE80]">*</span>
+                    </label>
+                    <span className="text-xs text-[#86868b]">Select one or more</span>
+                  </div>
+                  <div className="grid max-h-52 grid-cols-1 gap-2 overflow-y-auto rounded-xl border border-[#1A1A1A]/10 bg-[#FAF9F6] p-2 dark:border-[#E5E5E5]/10 dark:bg-[#0A0A0A] sm:grid-cols-2">
+                    {products.map((product) => {
+                      const selected = form.selectedProductIds.includes(product.id);
+                      return (
+                        <label
+                          key={product.id}
+                          className={`flex cursor-pointer items-center gap-3 rounded-lg border px-3 py-2.5 text-sm transition-colors ${selected
+                            ? "border-[#2D5A3D] bg-[#E8F4E8] text-[#1A1A1A] dark:border-[#4ADE80] dark:bg-[#1a3d2a] dark:text-[#E5E5E5]"
+                            : "border-transparent text-[#1A1A1A] hover:bg-white dark:text-[#E5E5E5] dark:hover:bg-[#111]"
+                            }`}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={selected}
+                            onChange={() => toggleProduct(product.id)}
+                            className="h-4 w-4 shrink-0 accent-[#2D5A3D] dark:accent-[#4ADE80]"
+                          />
+                          <span className="min-w-0 truncate">{product.shortName || product.name}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                  {products.length === 0 && (
+                    <p className="text-sm text-red-600 dark:text-red-400">Products are temporarily unavailable. Please try again later.</p>
+                  )}
+                </div>
+                <div className="space-y-2">
                   <label className="text-sm font-medium text-[#1A1A1A] dark:text-[#E5E5E5]">
                     Phone
                   </label>
@@ -185,7 +230,7 @@ export function ContactSection() {
 
                 <Button
                   type="submit"
-                  disabled={loading}
+                  disabled={loading || form.selectedProductIds.length === 0 || products.length === 0}
                   className="w-full rounded-xl cursor-pointer bg-[#2D5A3D] text-white hover:bg-[#1e3d29] dark:bg-[#4ADE80] dark:text-[#0A0A0A] dark:hover:bg-[#3ec46e] transition-colors font-semibold py-3 h-auto disabled:opacity-60"
                 >
                   {loading ? (

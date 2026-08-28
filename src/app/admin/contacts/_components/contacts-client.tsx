@@ -9,12 +9,11 @@ import {
   Star,
   Search,
   Loader2,
-  Send,
-  X,
   Reply,
   User,
   Calendar,
   Phone,
+  Package,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,14 +22,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import { toast } from "sonner";
 
 type Contact = {
@@ -39,8 +30,16 @@ type Contact = {
   email: string;
   phone: string | null;
   message: string;
+  selectedProducts: { id: number; name: string }[];
   isRead: boolean | null;
   isImportant: boolean | null;
+  createdAt: string;
+};
+
+type ContactReply = {
+  id: number;
+  sentBy: string;
+  message: string;
   createdAt: string;
 };
 
@@ -53,25 +52,24 @@ export function ContactsClient() {
   const [detailOpen, setDetailOpen] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [replyLoading, setReplyLoading] = useState(false);
-  const [replies, setReplies] = useState<any[]>([]);
+  const [replies, setReplies] = useState<ContactReply[]>([]);
   const [detailLoading, setDetailLoading] = useState(false);
 
 
   useEffect(() => {
-    fetchContacts();
+    const fetchContacts = async () => {
+      setLoading(true);
+      try {
+        const res = await api.get(`/admin/contacts?filter=${filter}`);
+        setContacts(res.data.data);
+      } catch {
+        toast.error("Failed to load contacts");
+      } finally {
+        setLoading(false);
+      }
+    };
+    void fetchContacts();
   }, [filter]);
-
-  const fetchContacts = async () => {
-    setLoading(true);
-    try {
-      const res = await api.get(`/admin/contacts?filter=${filter}`);
-      setContacts(res.data.data);
-    } catch {
-      toast.error("Failed to load contacts");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const notifyUnreadChange = (delta: number) => {
     window.dispatchEvent(
@@ -137,7 +135,8 @@ export function ContactsClient() {
     (c) =>
       c.name.toLowerCase().includes(search.toLowerCase()) ||
       c.email.toLowerCase().includes(search.toLowerCase()) ||
-      c.message.toLowerCase().includes(search.toLowerCase())
+      c.message.toLowerCase().includes(search.toLowerCase()) ||
+      c.selectedProducts.some((product) => product.name.toLowerCase().includes(search.toLowerCase()))
   );
 
   const tabs = [
@@ -238,9 +237,14 @@ export function ContactsClient() {
                       &lt;{contact.email}&gt;
                     </span>
                   </div>
-                  <p className="truncate text-sm text-[#86868b]">
-                    {contact.message}
-                  </p>
+                  <div className="flex min-w-0 flex-wrap items-center gap-1.5">
+                    {contact.selectedProducts.map((product) => (
+                      <span key={product.id} className="max-w-40 truncate rounded-full bg-[#E8F4E8] px-2 py-0.5 text-[10px] font-medium text-[#2D5A3D] dark:bg-[#1a3d2a] dark:text-[#4ADE80]">
+                        {product.name}
+                      </span>
+                    ))}
+                    <p className="min-w-0 flex-1 truncate text-sm text-[#86868b]">{contact.message}</p>
+                  </div>
                 </div>
 
                 <div className="hidden shrink-0 text-xs text-[#86868b] sm:block">
@@ -295,6 +299,22 @@ export function ContactsClient() {
                     addSuffix: true,
                   })}
                 </div>
+
+                {selected.selectedProducts.length > 0 && (
+                  <div className="rounded-xl border border-[#2D5A3D]/15 bg-[#E8F4E8]/50 p-4 dark:border-[#4ADE80]/20 dark:bg-[#1a3d2a]/30">
+                    <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-[#2D5A3D] dark:text-[#4ADE80]">
+                      <Package className="h-4 w-4" />
+                      Products of interest
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      {selected.selectedProducts.map((product) => (
+                        <span key={product.id} className="rounded-full border border-[#2D5A3D]/15 bg-white/80 px-2.5 py-1 text-xs font-medium text-[#1A1A1A] dark:border-[#4ADE80]/20 dark:bg-[#0A0A0A]/70 dark:text-[#E5E5E5]">
+                          {product.name}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
                 {/* Message */}
                 <div className="rounded-xl border border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 bg-[#FAF9F6] dark:bg-[#111] p-4">

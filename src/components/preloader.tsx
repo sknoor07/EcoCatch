@@ -2,23 +2,15 @@
 
 import { useLoading } from "./loading-provider";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
 
 export function Preloader() {
-  const { framesReady, sceneReady, setFramesReady, setSceneReady } = useLoading();
+  const { framesReady } = useLoading();
   const pathname = usePathname();
-  const isHome = pathname === "/";
   if (pathname !== "/") return null;
 
-  // On non-home pages, auto-mark everything as ready so preloader dismisses
-  useEffect(() => {
-    if (!isHome) {
-      setFramesReady(true);
-      setSceneReady(true);
-    }
-  }, [isHome, setFramesReady, setSceneReady]);
-
-  const done = framesReady && sceneReady;
+  // The first hero frame is enough to show a complete, usable page. The
+  // remaining animation frames continue loading in the background.
+  const done = framesReady;
 
   return (
     <div
@@ -34,16 +26,12 @@ export function Preloader() {
           <div
             className="h-full bg-[#4ADE80] transition-all duration-300"
             style={{
-              width: `${((framesReady ? 1 : 0) + (sceneReady ? 1 : 0)) * 50}%`,
+              width: framesReady ? "100%" : "0%",
             }}
           />
         </div>
         <div className="mt-3 text-xs text-[#86868b]">
-          {framesReady
-            ? sceneReady
-              ? "Ready"
-              : "Preparing 3D scene..."
-            : "Loading frames..."}
+          {framesReady ? "Ready" : "Loading homepage..."}
         </div>
       </div>
     </div>
