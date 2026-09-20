@@ -18,7 +18,7 @@ export function BiogasPlant3D() {
   const [isExploded, setIsExploded] = useState(false);
   const [isNearViewport, setIsNearViewport] = useState(false);
 
-  const getFrameName = useCallback((index: number) => `/images/explode/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`, []);
+  const getFrameName = useCallback((index: number) => `/explode/ezgif-frame-${index.toString().padStart(3, "0")}.jpg`, []);
 
   useEffect(() => {
     const section = sectionRef.current;
