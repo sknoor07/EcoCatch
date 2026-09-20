@@ -28,7 +28,7 @@ export function HeroSection() {
 
       {/* Scroll-driven canvas sequence */}
       <ScrollSequence
-        framePath="/images/powerplant/"
+        framePath="/powerplant/"
         framePrefix="ezgif-frame-"
         frameExtension=".jpg"
         totalFrames={276}
