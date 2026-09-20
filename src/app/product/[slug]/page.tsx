@@ -14,11 +14,30 @@ interface Props {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const product = await getProductBySlug(slug); // <-- FETCH FROM DB
+  const product = await getProductBySlug(slug);
   if (!product) return { title: "Not Found" };
+
+  const ogImage = product.image?.[0] || "/social_share/og-products.png";
+
   return {
     title: `${product.name} — EcoCatch Products`,
     description: product.description,
+    alternates: {
+      canonical: `/product/${product.slug}`,
+    },
+    openGraph: {
+      title: `${product.name} — EcoCatch`,
+      description: product.description,
+      type: "website",
+      url: `https://ecocatch.in/product/${product.slug}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: product.name }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: `${product.name} — EcoCatch`,
+      description: product.description,
+      images: [ogImage],
+    },
   };
 }
 

@@ -25,7 +25,7 @@ export function ProductGrid({ products }: { products: Product[] }) {
               Core Solutions
             </p>
             <h2 className="text-3xl font-bold tracking-tight text-[#1A1A1A] dark:text-[#E5E5E5] sm:text-5xl max-w-2xl">
-              Seven ways we power your plant
+              Five ways we power your plant
             </h2>
           </div>
         </ScrollReveal>

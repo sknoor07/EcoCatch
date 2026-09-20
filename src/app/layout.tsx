@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   authors: [{ name: "EcoCatch Energy Solutions" }],
   creator: "EcoCatch Energy Solutions Pvt. Ltd.",
   metadataBase: new URL("https://ecocatch.in"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_IN",
@@ -35,13 +38,13 @@ export const metadata: Metadata = {
     title: "EcoCatch — BioGAS & Sustainable Energy Solutions",
     description:
       "Transforming organic waste into clean energy. 150+ plants installed across India.",
-    images: [{ url: "/og-image.jpg", width: 1200, height: 630, alt: "EcoCatch Biogas Plant" }],
+    images: [{ url: "/social_share/og-about.png", width: 1200, height: 630, alt: "EcoCatch Biogas Plant" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "EcoCatch — BioGAS & Sustainable Energy Solutions",
     description: "Transforming organic waste into clean energy since 2016.",
-    images: ["/og-image.jpg"],
+    images: ["/social_share/og-about.png"],
   },
   robots: {
     index: true,

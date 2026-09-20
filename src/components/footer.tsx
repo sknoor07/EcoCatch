@@ -27,7 +27,7 @@ const footerLinks = {
   Legal: [
     { label: "Privacy Policy", href: "/privacy-policy" },
     { label: "Terms of Service", href: "/terms-of-service" },
-    { label: "Cookie Policy", href: "#" },
+    { label: "Cookie Policy", href: "/cookie-policy" },
     { label: "Sitemap", href: "/sitemap.xml" }
   ],
 };
@@ -97,7 +97,7 @@ export function Footer() {
 
         <div className="mt-16 flex flex-col items-center justify-between gap-4 border-t border-[#1A1A1A]/5 dark:border-[#E5E5E5]/5 pt-8 sm:flex-row">
           <p className="text-md text-[#86868b]">
-            &copy; {2022} EcoCatch Energy Solutions Pvt. Ltd. All rights reserved.
+            &copy; {new Date().getFullYear()} EcoCatch Energy Solutions Pvt. Ltd. All rights reserved.
           </p>
           <p className="text-xs text-[#86868b]">
             Made with care in Mumbai, India

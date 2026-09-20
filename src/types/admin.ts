@@ -40,7 +40,7 @@ export interface Product {
   features: string[];
   specs: { label: string; value: string }[] | null;
   applications: string[] | null;
-  image: string | null;
+  image: string[] | null;
   brand: string | null;
   brandOrigin: string | null;
   category: string;

@@ -67,12 +67,12 @@ export function ProductSidebar({ activeSlug, allProducts }: Props) {
         <p className="text-xs text-[#86868b] mb-3">
           Our engineers can recommend the right equipment for your feedstock.
         </p>
-        <a
+        <Link 
           href="/#contact"
           className="inline-flex items-center gap-1 text-xs font-semibold text-[#2D5A3D] dark:text-[#4ADE80] hover:underline"
         >
           Get a consultation →
-        </a>
+        </Link>
       </div>
     </div>
   );

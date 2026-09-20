@@ -70,7 +70,7 @@ export function ServicesSection() {
           {services.map((service, i) => (
             <ScrollReveal key={service.id} delay={i * 0.1} className={service.className}>
               <div
-                className={`group relative h-full overflow-hidden rounded-2xl p-6 md:p-8 transition-all duration-500 hover:scale-[1.02] hover:shadow-xl cursor-pointer ${service.bg}`}
+                className={`group relative h-full overflow-hidden rounded-2xl p-6 md: transition-all duration-500 hover:scale-[1.02] hover:shadow-xl cursor-pointer ${service.bg}`}
               >
                 <div className="flex h-full flex-col justify-between">
                   <div className="flex items-start justify-between">
@@ -79,7 +79,7 @@ export function ServicesSection() {
                     </div>
                     <ArrowUpRight className="h-5 w-5 opacity-0 transition-all duration-300 group-hover:opacity-100 group-hover:translate-x-1 group-hover:-translate-y-1" />
                   </div>
-                  <div className="mt-4">
+                  <div>
                     <h3 className="text-xl md:text-2xl font-semibold mb-2">{service.title}</h3>
                     <p className="text-sm md:text-base opacity-80 leading-relaxed max-w-md">{service.description}</p>
                   </div>

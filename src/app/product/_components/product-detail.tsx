@@ -1,7 +1,7 @@
 "use client";
 
 import { ScrollReveal } from "@/components/scroll-reveal";
-
+import { ProductGallery } from "./product-gallery";
 import { Check, ArrowRight, Mail } from "lucide-react";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -48,6 +48,10 @@ export function ProductDetail({ product }: { product: Product }) {
             {product.longDescription || product.description}
           </p>
         </div>
+      </ScrollReveal>
+      {/* Gallery */}
+      <ScrollReveal>
+        <ProductGallery slug={product.slug} images={product.image} productName={product.name} />
       </ScrollReveal>
 
       {/* Features */}

@@ -9,7 +9,7 @@ const founders = [
     initials: "YR",
     name: "Yugal Roy",
     role: "Founder & Managing Director",
-    photo: "/founders/ritik.jpg",
+    photo: "",
     bio: "A visionary entrepreneur who saw opportunity in India's agricultural waste. With deep expertise spanning biogas, waste processing, oil & gas, cement, industrial automation, and energy audits, Yugal built EcoCatch into a full-service EPC company trusted by 150+ clients across the nation.",
     extra: "Under his leadership, EcoCatch has bridged global technology with local execution — importing cutting-edge equipment from Italy, Northern Ireland, UK, and the US, while maintaining a strong Make-in-India fabrication presence in Vasai.",
     phone: "+919892906496",
@@ -19,24 +19,24 @@ const founders = [
     gradient: "from-[#1B4332] to-[#2D5A3D]",
   },
   {
-    initials: "AK",
-    name: "Amit Khanna",
+    initials: "ZM",
+    name: "Zulkif Mukhtar",
     role: "Co-Founder & CTO",
-    photo: "/founders/amit-khanna.jpg",
-    bio: "A seasoned technologist with 15+ years in renewable energy systems and process engineering. Amit architects the core biogas and waste-to-energy solutions that power EcoCatch's project portfolio across India.",
+    photo: "",
+    bio: "Biomethanation & Sustainable Waste Management Specialist Holding an M.Tech in Green Technology from the Institute of Chemical Technology (ICT), Mumbai, Zulkif Shaikh is a seasoned professional in the field of waste-to-energy, with a specific focus on biomethanation. He has over nine years of expertise in designing, commissioning, and managing decentralized biogas systems, integrating community stakeholders, industries, and ULBs.",
     extra: "He leads R&D partnerships with European technology providers and ensures every plant design meets the highest efficiency and safety standards.",
     phone: "+919876543210",
     email: "amit@ecocatch.in",
-    linkedin: "https://linkedin.com/in/amit-khanna",
+    linkedin: "https://www.linkedin.com/in/zulkif-shaikh-01b1617a/",
     location: "Mumbai, Maharashtra, India",
     gradient: "from-[#0F2E1F] to-[#1B4332]",
   },
   {
-    initials: "SP",
-    name: "Sneha Patel",
+    initials: "AP",
+    name: "ABHAYKUMAR PATIL",
     role: "Co-Founder & COO",
-    photo: "/founders/sneha-patel.jpg",
-    bio: "An operations expert who scaled EcoCatch's execution capabilities from a single workshop to a nationwide EPC presence. Sneha oversees project delivery, supply chain, and client relationships.",
+    photo: "",
+    bio: "A seasoned engineering professional with 35+ years of expertise in industrial electronics, electrical panel design, automation systems, corrosion protection, STP/biogas/WtE technologies, and international technical marketing. Demonstrated ability to lead complex engineering assignments, deliver sustainable infrastructure solutions, and support global industrial clients. Recognized for combining deep technical insight with practical execution across power plants, oil & gas, waste management, and manufacturing ecosystems.",
     extra: "Her background in industrial automation and energy audits ensures seamless integration of imported technology with local fabrication and on-ground execution.",
     phone: "+919812345678",
     email: "sneha@ecocatch.in",
@@ -93,7 +93,7 @@ export function FounderProfile() {
                 <div className="relative flex justify-center">
                   <div className="absolute -top-16">
                     <div className=" relative h-32 w-32 rounded-full border-4 border-white dark:border-[#111] bg-[#1B4332] shadow-xl overflow-hidden transition-transform duration-500 group-hover:scale-105">
-                      {founder.photo ? (
+                      {founder.photo.trim() ? (
                         <Image
                           src={founder.photo}
                           alt={founder.name}

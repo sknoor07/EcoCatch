@@ -89,7 +89,7 @@ export const products = pgTable("products", {
   specs: jsonb("specs").$type<{label: string, value: string}[]>(),
   applications: jsonb("applications").$type<string[]>(),
   
-  image: varchar("image", { length: 255 }),
+  image: varchar("image", { length: 255 }).array(),
   brand: varchar("brand", { length: 255 }),
   brandOrigin: varchar("brand_origin", { length: 255 }),
   category: varchar("category", { length: 100 }).notNull(),

@@ -9,7 +9,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 1.0, // Highest priority for the homepage
+      priority: 1.0,
     },
     {
       url: `${baseUrl}/about-us`,
@@ -27,7 +27,25 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       url: `${baseUrl}/product`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
-      priority: 0.9, // High priority for the main products hub
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/privacy-policy`,
+      lastModified: new Date('2026-08-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/terms-of-service`,
+      lastModified: new Date('2026-08-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
+    },
+    {
+      url: `${baseUrl}/cookie-policy`,
+      lastModified: new Date('2026-09-01'),
+      changeFrequency: 'yearly',
+      priority: 0.3,
     },
   ]
 
@@ -40,7 +58,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.6,
   }));
 
-
-  // 3. Combine both and return them to Next.js
   return [...staticRoutes, ...dynamicRoutes]
 }

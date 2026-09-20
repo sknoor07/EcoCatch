@@ -8,17 +8,13 @@ import { getActiveProducts } from "@/lib/product_data";
 export const metadata: Metadata = {
   title: "Products & Equipment | EcoCatch",
   description: "Explore EcoCatch's range of biogas equipment: DODA pumps, separators, mixers, AMAG RETI odorizing systems, and end-to-end EPC solutions.",
-  alternates: {
-    canonical: "/product",
-  },
+  alternates: { canonical: "/product" },
   openGraph: {
     title: "EcoCatch Products & Equipment",
     description: "Explore our range of biogas equipment imported from Italy, UK, US, and Northern Ireland.",
-    url: "https://ecocatch.in/product",
-    images: [{ url: "/og-products.jpg", width: 1200, height: 630 }],
+    images: [{ url: "/social_share/og-products.png", width: 1200, height: 630, alt: "EcoCatch Products & Equipment" }],
   },
 };
-
 
 export default async function ProductPage() {
   const allProducts = await getActiveProducts();

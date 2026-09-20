@@ -1,10 +1,11 @@
 import { Metadata } from "next";
 import { Footer } from "@/components/footer";
 
-export const metadata: Metadata = {
+export const metadata : Metadata = {
     title: "Privacy Policy — EcoCatch Energy Solutions",
     description: "Learn how EcoCatch Energy Solutions collects, uses, and protects your personal data.",
 };
+
 
 export default function PrivacyPolicyPage() {
     return (

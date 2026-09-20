@@ -8,7 +8,7 @@ export function StructuredData() {
         "@id": "https://ecocatch.in/#organization",
         "name": "EcoCatch Energy Solutions Pvt. Ltd.",
         "url": "https://ecocatch.in",
-        "logo": "https://ecocatch.in/logo.png",
+        "logo": "https://ecocatch.in/mobile/icon_512.png",
         "description": "End-to-end biogas plant engineering, manufacturing, and installation across India. Transforming waste into clean energy since 2016.",
         "foundingDate": "2016",
         "founders": [
